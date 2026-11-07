@@ -37,7 +37,8 @@ export function ChatScreen({ onOpenDrawer }: { onOpenDrawer: () => void }) {
   }, []);
 
   useEffect(() => {
-    listRef.current?.scrollTo({ top: listRef.current.scrollHeight });
+    const el = listRef.current;
+    if (el && typeof el.scrollTo === "function") el.scrollTo({ top: el.scrollHeight });
   }, [messages.length, busy]);
 
   const sendLocal = async (text: string) => {

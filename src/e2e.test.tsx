@@ -8,7 +8,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { render, screen, waitFor } from "@testing-library/react";
 import { db, ensureSeeded } from "@/data/db";
 import { monthTotals } from "@/data/finance";
-import { sendUserMessage, decideProposal } from "@/services/ai/engine";
+import { sendUserMessage, decideProposal, pushWeeklySummary } from "@/services/ai/engine";
 import { applyProposal } from "@/services/ai/executor";
 import { FinanceScreen } from "@/features/finance/FinanceScreen";
 import type { ActionProposal } from "@/domain/actions";
@@ -129,8 +129,7 @@ describe("fluxo completo (spending pela conversa)", () => {
   });
 });
 
-describe("dashboard mostra o resultado", () => {
-  it("após aplicar, FinanceScreen mostra R$ 30,00 de saída", async () => {
+describe("dashboard mostra o resultado", () => {  it("após aplicar, FinanceScreen mostra R$ 30,00 de saída", async () => {
     const { assistantMsg } = await sendUserMessage("gastei 30 no almoço");
     await decideProposal(
       assistantMsg!.id,
@@ -149,4 +148,24 @@ describe("dashboard mostra o resultado", () => {
       { timeout: 3000 },
     );
   }, 8000);
+});
+
+describe("resumo semanal no chat", () => {
+  it("pushWeeklySummary responde com mensagem de resumo e números reais", async () => {
+    // dado real: um gasto confirmado
+    const { assistantMsg } = await sendUserMessage("gastei 30 no almoço");
+    await decideProposal(
+      assistantMsg!.id,
+      0,
+      "confirm",
+      assistantMsg!.actions![0]!.payload as ActionProposal,
+      applyProposal,
+    );
+
+    const summaryMsg = await pushWeeklySummary();
+    expect(summaryMsg.kind).toBe("summary");
+    expect(summaryMsg.body).toContain("Resumo");
+    // sem IA configurada: texto local truthful com o número real
+    expect(summaryMsg.body).toMatch(/30,00/);
+  });
 });

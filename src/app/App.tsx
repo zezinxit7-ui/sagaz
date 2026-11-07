@@ -16,6 +16,7 @@ import {
 import { Drawer, DrawerCaption, DrawerItem } from "@/components/ui";
 import { getProfile, hasPin, verifyPin } from "@/data/profile";
 import { db } from "@/data/db";
+import { scheduleAll, ensureChannel } from "@/services/notifications";
 import { ChatScreen } from "@/features/chat/ChatScreen";
 import { FinanceScreen } from "@/features/finance/FinanceScreen";
 import { RemindersScreen } from "@/features/productivity/RemindersScreen";
@@ -48,6 +49,19 @@ export function App() {
     if (locked === false) return;
     // novo PIN definido com app aberto → refletir no próximo início apenas
   }, [profile?.pinHash]);
+
+  // proatividade local: canal de notificação ceux + agendamento de lembretes/assinaturas
+  async function scheduleLocalHandlers(): Promise<void> {
+    try {
+      await ensureChannel();
+      await scheduleAll();
+    } catch {
+      // sem impacto no app
+    }
+  }
+  useEffect(() => {
+    void scheduleLocalHandlers();
+  }, []);
 
   if (locked) {
     return <LockScreen onUnlock={() => setLocked(false)} />;

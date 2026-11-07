@@ -2,10 +2,10 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useLiveQuery } from "dexie-react-hooks";
-import { Mic, Send, Sparkles } from "lucide-react";
+import { Mic, Send, Sparkles, BarChart3 } from "lucide-react";
 import { TopBar } from "@/components/ui";
 import { db } from "@/data/db";
-import { decideProposal, patchProposalPayload, retryQueued, sendUserMessage } from "@/services/ai/engine";
+import { decideProposal, patchProposalPayload, pushWeeklySummary, retryQueued, sendUserMessage } from "@/services/ai/engine";
 import { applyProposal } from "@/services/ai/executor";
 import { parseActionsLocal } from "@/services/ai/localParser";
 import { resolveAI } from "@/services/ai/config";
@@ -173,6 +173,15 @@ export function ChatScreen({ onOpenDrawer }: { onOpenDrawer: () => void }) {
             <Send size={18} />
           </button>
         </div>
+        <div className="flex justify-center pb-2">
+          <button
+            className="chip bg-surface-2"
+            disabled={busy}
+            onClick={() => void pushWeeklySummary()}
+          >
+            <BarChart3 size={13} /> Resumo da semana
+          </button>
+        </div>
         <p className="pb-2 text-center text-xs text-muted">
           Sagaz é IA. Ele propõe — você confirma antes de virar registro.
         </p>
@@ -205,9 +214,20 @@ function MessageRow({
   return (
     <div className="flex justify-start">
       <div className="w-full max-w-[95%]">
-        <div className="rounded-[18px] rounded-bl-md bg-surface px-3.5 py-2.5 text-base text-ink">
-          <span className="block whitespace-pre-wrap break-words">{message.body}</span>
-        </div>
+        {message.kind === "summary" ? (
+          <div className="card rise p-3">
+            <div className="mb-1 flex items-center gap-2 text-sm font-semibold text-accent">
+              <BarChart3 size={15} /> Resumo da semana
+            </div>
+            <span className="block whitespace-pre-wrap break-words text-base text-ink">
+              {message.body}
+            </span>
+          </div>
+        ) : (
+          <div className="rounded-[18px] rounded-bl-md bg-surface px-3.5 py-2.5 text-base text-ink">
+            <span className="block whitespace-pre-wrap break-words">{message.body}</span>
+          </div>
+        )}
         {message.kind === "action_card" && message.actions ? (
           <div className="mt-2 space-y-2">
             {message.actions.map((a, i) => (

@@ -9,10 +9,34 @@
 import { addMessage, currentConversation, listMemories, setCardActionStatus } from "@/data/chat";
 import { extractActions } from "./actionExtractor";
 import { AIUnavailableError } from "./client";
-import { db, type Message } from "@/data/db";
-import { todayLocal } from "@/domain/dates";
-import { BUSINESS_CONTEXT_ID, PERSONAL_CONTEXT_ID } from "@/data/db";
+import { db, PERSONAL_CONTEXT_ID, BUSINESS_CONTEXT_ID, type Message } from "@/data/db";
+import { todayLocal, formatDayShort } from "@/domain/dates";
 import { validateProposal, type ActionProposal } from "@/domain/actions";
+import { weeklyReport } from "./summarizer";
+
+/**
+ * Envia um pedido de resumo semanal como mensagem do assistente:
+ * números calculados no banco, IA só redige quando há chave.
+ */
+export async function pushWeeklySummary(): Promise<Message> {
+  const conv = await currentConversation();
+  const report = await weeklyReport(PERSONAL_CONTEXT_ID);
+  await addMessage({
+    conversationId: conv.id,
+    role: "user",
+    kind: "text",
+    body: "Como foi minha semana?",
+    status: "sent",
+  });
+  const range = `${formatDayShort(report.rangeStart)} – ${formatDayShort(report.rangeEnd)}`;
+  return addMessage({
+    conversationId: conv.id,
+    role: "assistant",
+    kind: "summary",
+    body: `Resumo ${range}\n\n${report.text}`,
+    status: "sent",
+  });
+}
 
 function isOnline(): boolean {
   return typeof navigator === "undefined" ? true : navigator.onLine !== false;

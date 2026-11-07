@@ -1,0 +1,60 @@
+feature,area,priority,original,clone,notes
+Criar conta (cadastro),onboarding,must,yes,no,
+Autenticar (email/Google),onboarding,must,yes,no,
+Excluir conta e todos os dados (inclusive memória) dentro do app,onboarding,should,yes,no,LGPD; o site promete exclusão integral
+Conversa por texto com histórico,assistant,must,yes,no,S01
+Mensagens de áudio no chat,assistant,should,yes,no,"você fala, manda áudio; o brief pede áudio quando suportado"
+Uma mensagem dispara várias ações,assistant,must,yes,no,"gastei 30 no almoço e me lembra da luz amanhã" vira transação + lembrete
+Registrar despesa por linguagem natural (valor/data/categoria),assistant,must,yes,no,extração de valor e sugestão de categoria
+Registrar receita por linguagem natural,assistant,must,yes,no,
+Escolher contexto pessoa física/negócio pelo contexto da mensagem,assistant,should,yes,no,"o almoço vai pro seu bolso, o corte de cabelo pro caixa da barbearia"
+Criar lembrete/tarefa pela conversa,assistant,must,yes,no,
+Registrar hábito pela conversa ("bebi 2 litros de água"),assistant,should,yes,no,
+Confirmar cada ação na conversa antes de aplicar,assistant,must,yes,no,o Tony registra e confirma o que fez; o clone nunca aplica sem confirmação
+Visualizar/editar lançamentos direto na conversa,assistant,should,yes,no,"errou um detalhe? corrige por mensagem"
+Responder perguntas sobre os dados com número exato,assistant,must,yes,no,"quantas vezes treinei? 12 de 30 dias"
+Responder que não sabe quando não há dado,assistant,should,yes,no,site: "responde com o dado, e quando não sabe diz que não sabe"
+"Memória de preferências (apelido, estilo) com direito ao esquecimento",assistant,should,yes,no,memória compartilhada por voz e chat
+Disclaimer de IA no rodapé do chat,assistant,should,yes,no,"Tony é uma IA e pode cometer erros"
+Entrada por voz no chat (STT),assistant,should,yes,no,brief: áudio quando suportado
+Conversa por voz em tempo real (orbe interrompível),assistant,could,yes,no,a parte mais pesada; exige streaming full-duplex
+Modo offline com fila de mensagens,assistant,should,yes,no,"Sem conexão · 2 mensagens na fila"; app abre com todos os dados
+Mensagem proativa matinal (plano do dia),assistant,should,yes,no,agenda + vencimentos do dia na conversa
+Resumo semanal automático no domingo,assistant,must,yes,no,brief: resumos periódicos
+Dashboard com saldo disponível,finance,must,yes,no,S07 "Saldo Disponível"; S08 "Saldo Empresarial"
+Botão olho para ocultar valores,finance,should,yes,no,visível nas duas telas de finanças
+Lançamento manual de receita/despesa,finance,must,yes,no,botões circulares Receita/Despesa no dashboard
+Edição e exclusão de transações,finance,must,yes,no,exigido pelo brief
+Categorias personalizadas com ícone,finance,must,yes,no,S07 mostra categoria "Saúde" com ícone
+Lista de transações agrupada por dia (HOJE/ONTEM),finance,must,yes,no,S07/S08
+Filtro Tudo/Receitas/Despesas,finance,must,yes,no,chips nas duas telas
+Seletor de mês e histórico mensal,finance,must,yes,no,"< Maio 2026"
+"Resumo do mês com receitas, despesas e balanço",finance,must,yes,no,visto em S07/S08
+Gráficos financeiros,finance,must,yes,no,brief exige; visualização não observada — desenho próprio
+Relatórios financeiros (módulo Relatório),finance,must,yes,no,botão visto; corpo da tela não observado — formato próprio
+Insights financeiros,finance,could,yes,no,botão visto; corpo não observado; avaliar em fase avançada
+Gastos recorrentes/assinaturas com próxima cobrança e alerta,finance,must,yes,no,brief pede; card "Assinaturas — Gastos recorrentes"
+Orçamento mensal,finance,must,yes,no,brief; incluir orçamento por categoria
+Metas de economia com progresso e prazo,finance,must,yes,no,site: anel de atividade + prazo
+Separação pessoa física vs. negócio (dois caixas),finance,should,yes,no,dual ledger atravessando transações, orçamentos e metas
+Hábitos com sequência de dias (streak),productivity,must,yes,no,site: "23 dias seguidos" e linha STQQSSD
+Meta numérica por hábito,productivity,should,yes,no,"bebi 2 litros de água"
+Calendário mensal de hábito,productivity,should,yes,no,
+Tarefas com prioridade e prazo,productivity,must,yes,no,
+Visão lista de lembretes/tarefas,productivity,must,yes,no,
+Visão calendário de lembretes/tarefas,productivity,must,yes,no,grade mensal em S04
+Visão kanban de tarefas,productivity,could,yes,no,seletor de visão visto; corpo não observado
+Métricas de lembretes (pendentes/atrasadas/hoje/concluídas),productivity,should,yes,no,cartões coloridos em S04
+Lembretes recorrentes (diária/semanal/mensal + dias da semana),productivity,must,yes,no,S05 com chips de dias
+Calendário/agenda do dia,productivity,must,yes,no,manhã: "treino às 7h, reunião às 10h, boleto vence"
+Metas pessoais com etapas e progresso,productivity,must,yes,no,brief
+Dieta: foto do prato estimada em kcal e macros,diet,could,yes,no,precisa modelo multimodal via API do usuário; fora do escopo obrigatório
+Dieta: meta diária de calorias com histórico e calendário,diet,could,yes,no,
+Diário pessoal,life,could,yes,no,item de menu observado; o brief não exige
+Ideias (captura rápida),life,could,yes,no,item de menu observado; o brief não exige
+Planos pagos com assinatura in-app,billing,could,yes,no,monetização própria em fase posterior
+Exportar todos os dados,settings,should,yes,no,LGPD; site promete exportação integral
+Conexão com banco integrada,banking,skip,no,skip,o Tony não conecta ao banco nem executa pagamentos (decisão de desenho)
+Pagamentos e transferências,banking,skip,no,skip,mesma razão
+Recursos sociais entre usuários,community,skip,no,skip,produto é individual
+Catálogos e conteúdos licenciados,content,skip,no,skip,indisponível para clone limpo

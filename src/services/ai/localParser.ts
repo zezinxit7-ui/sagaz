@@ -35,14 +35,27 @@ export async function parseActionsLocal(
   const proposals: ActionProposal[] = [];
   let index = 0;
 
-  const hint = extractDateHint(text);
+  /**
+   * Multi-ação: recorta a frase na cláusula do lembrete (último verbo de
+   * lembrar). O que fica ANTES é transação; DEPOIS é lembrete. A data
+   * "amanhã" não vaza do lembrete para o gasto (e vice-versa).
+   */
+  let splitAt = -1;
+  const verbRe = /(?:me\s+)?(?:lembra(?:r)?|lembre|avisa(?:r)?|lembrete)/gi;
+  let vm: RegExpExecArray | null;
+  while ((vm = verbRe.exec(text)) !== null) splitAt = vm.index;
+  const before = splitAt >= 0 ? text.slice(0, splitAt) : text;
+  const after = splitAt >= 0 ? text.slice(splitAt) : "";
+
+  const hintBefore = extractDateHint(before);
+  const hintAfter = extractDateHint(after);
   const money = extractMoneyCents(text);
 
-  const hasDateOrRecurrence = Boolean(hint.date || hint.recurrence);
+  const isExpense = money !== null && EXPENSE_VERBS.test(before);
+  const isIncome = money !== null && INCOME_VERBS.test(before);
   const isReminder =
-    REMINDER_VERBS.test(text) || (BILL_WORDS.test(text) && hasDateOrRecurrence && !money);
-  const isExpense = money !== null && EXPENSE_VERBS.test(text);
-  const isIncome = money !== null && INCOME_VERBS.test(text);
+    REMINDER_VERBS.test(text) ||
+    (BILL_WORDS.test(after) && Boolean(hintAfter.date || hintAfter.recurrence) && !isExpense);
 
   if (isExpense && money) {
     proposals.push({
@@ -50,8 +63,8 @@ export async function parseActionsLocal(
       kind: "expense",
       transactionType: "expense",
       amountCents: money.amountCents,
-      date: hint.date,
-      note: deriveNote(text, EXPENSE_VERBS) ?? undefined,
+      date: hintBefore.date,
+      note: deriveNote(before, EXPENSE_VERBS) ?? undefined,
     });
   }
 
@@ -61,8 +74,8 @@ export async function parseActionsLocal(
       kind: "income",
       transactionType: "income",
       amountCents: money.amountCents,
-      date: hint.date,
-      note: deriveNote(text, INCOME_VERBS) ?? undefined,
+      date: hintBefore.date,
+      note: deriveNote(before, INCOME_VERBS) ?? undefined,
     });
   }
 
@@ -73,15 +86,18 @@ export async function parseActionsLocal(
         actionId: makeActionId(conversationId, index++),
         kind: "reminder",
         title,
-        dueDate: hint.date,
-        dueTime: hint.time,
-        recurrence: hint.recurrence && hint.recurrence !== "none" ? hint.recurrence : undefined,
-        weekdays: hint.weekdays,
+        dueDate: hintAfter.date,
+        dueTime: hintAfter.time || hintBefore.time,
+        recurrence:
+          hintAfter.recurrence && hintAfter.recurrence !== "none"
+            ? hintAfter.recurrence
+            : hintBefore.recurrence !== "none" && hintBefore.recurrence
+              ? hintBefore.recurrence
+              : undefined,
+        weekdays: hintAfter.weekdays ?? hintBefore.weekdays,
       });
     }
   }
-
-  // memória persistida pode ser usada aqui no futuro (não aplica nada agora)
 
   return proposals;
 }
